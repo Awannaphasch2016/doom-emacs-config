@@ -139,6 +139,7 @@ Sanitizes NAME to Doppler rules (only uppercase letters, digits and underscores)
 
 ;; Requires your existing anak/doppler--sanitize-secret-name
 
+
 (defun anak/doppler-get-secret (name project config &optional copy)
   "Get a Doppler secret NAME for PROJECT/CONFIG.
 If COPY is non-nil (or user answers yes), copy the raw secret value to the kill-ring
@@ -153,19 +154,15 @@ and remove the buffer to avoid leaving the secret visible."
          (buf (get-buffer-create "*Doppler Get Secret*"))
          ;; prefer --raw to get the unprocessed value; --copy would let doppler copy to clipboard
          (args (list "secrets" "get" name "--copy" "--raw" "--project" project "--config" config)))
-    (with-current-buffer buf (erase-buffer))
-    (let ((exit (apply #'call-process "doppler" nil buf nil args)))
+    (let ((exit (apply #'call-process "doppler" nil nil nil args))
+          (env (current-kill 0)))
       (if (= exit 0)
-          (let ((val (string-trim (with-current-buffer buf (buffer-string)))))
+          (progn
             (if copy
-                (progn
-                  (message "✅ Secret %s copied to kill-ring (buffer removed)" name))
-              (progn
-                (display-buffer buf)
-                (message "✅ Secret %s retrieved (visible in %s)" name (buffer-name buf)))))
-        (progn
-          (display-buffer buf)
-          (message "❌ Doppler get failed (exit %d) — see buffer %s" exit (buffer-name buf)))))))
+                (message "✅ Secret %s copied to kill-ring (buffer removed)" name)
+              (message "✅ Secret %s retrieved (visible in %s)" name (buffer-name buf)))
+            env)
+        (message "❌ Doppler get failed (exit %d) — see buffer %s" exit (buffer-name buf))))))
 
 
 (defun anak/doppler-delete-secret (name project config &optional assume-yes)
@@ -202,53 +199,54 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
 
 ;;; --- Provider registry: OpenAI + Anthropic ---------------------------------
 
-(defvar anak/gptel-providers
-  `((openai
-     :env "OPENAI_API_KEY"
-     :backend (lambda ()
-                (gptel-make-openai
-                 "openai"
-                 :protocol "https"
-                 :host "api.openai.com"
-                 :endpoint "/v1/chat/completions"
-                 :models '(gpt-4o gpt-4o-mini)
-                 :key #'anak/gptel-api-key
-                 :stream t
-                 :curl-args '("--retry" "2" "--max-time" "60")
-                 :request-params '(:temperature 0.7 :top_p 1.0))))
-    (anthropic
-     :env "ANTHROPIC_API_KEY"
-     :backend (lambda ()
-                (gptel-make-anthropic
-                 "anthropic"
-                 :key #'anak/gptel-api-key
-                 :models '(claude-3-5-sonnet claude-3-5-haiku)
-                 :stream t
-                 :curl-args '("--retry" "2" "--max-time" "60")
-                 :request-params '(:temperature 0.7 :top_p 1.0)))))
-  "Registry of GPTel providers (OpenAI and Anthropic only).
-Each entry maps PROVIDER -> plist with :env and :backend.
-:backend must return a fully constructed `gptel-backend' struct.")
+(after! gptel
+  (defvar anak/gptel-providers
+        `((openai
+        :env "OPENAI_API_KEY"
+        :backend (lambda ()
+                        (gptel-make-openai
+                        "openai"
+                        :protocol "https"
+                        :host "api.openai.com"
+                        :endpoint "/v1/chat/completions"
+                        :models '(gpt-4o gpt-4o-mini)
+                        :key #'anak/gptel-api-key
+                        :stream t
+                        :curl-args '("--retry" "2" "--max-time" "60")
+                        :request-params '(:temperature 0.7 :top_p 1.0))))
+        (anthropic
+        :env "ANTHROPIC_API_KEY"
+        :backend (lambda ()
+                        (gptel-make-anthropic
+                        "anthropic"
+                        :key #'anak/gptel-api-key
+                        :models '(claude-3-5-sonnet claude-3-5-haiku)
+                        :stream t
+                        :curl-args '("--retry" "2" "--max-time" "60")
+                        :request-params '(:temperature 0.7 :top_p 1.0)))))
+        "Registry of GPTel providers (OpenAI and Anthropic only).
+        Each entry maps PROVIDER -> plist with :env and :backend.
+        :backend must return a fully constructed `gptel-backend' struct.")
 
-(defun anak/gptel--provider-names ()
-  (mapcar #'symbol-name (mapcar #'car anak/gptel-providers)))
+        (defun anak/gptel--provider-names ()
+        (mapcar #'symbol-name (mapcar #'car anak/gptel-providers)))
 
-;;; --- Provider switcher ------------------------------------------------------
+        ;;; --- Provider switcher ------------------------------------------------------
 
-(defun anak/gptel-set-provider (provider)
-  "Activate GPTel PROVIDER (symbol). Uses env var per `anak/gptel-providers'."
-  (interactive
-   (list (intern (completing-read "Provider: " (anak/gptel--provider-names) nil t))))
-  (let* ((spec (alist-get provider anak/gptel-providers)))
-    (unless spec (user-error "Unknown provider: %s" provider))
-    (setq anak/gptel-current-envvar (plist-get spec :env))
-    (setq gptel-backend (funcall (plist-get spec :backend)))
-    (setq gptel-api-key #'anak/gptel-api-key)
-    (message "gptel -> provider: %s (env: %s)"
-             provider (or anak/gptel-current-envvar "none")))
-  gptel-backend)
+        (defun anak/gptel-set-provider (provider)
+        "Activate GPTel PROVIDER (symbol). Uses env var per `anak/gptel-providers'."
+        (interactive
+        (list (intern (completing-read "Provider: " (anak/gptel--provider-names) nil t))))
+        (let* ((spec (alist-get provider anak/gptel-providers)))
+        (unless spec (user-error "Unknown provider: %s" provider))
+        (setq anak/gptel-current-envvar (plist-get spec :env))
+        (setq gptel-backend (funcall (plist-get spec :backend)))
+        (setq gptel-api-key #'anak/gptel-api-key)
+        (message "gptel -> provider: %s (env: %s)"
+                provider (or anak/gptel-current-envvar "none")))
+        gptel-backend)
 
-(anak/gptel-set-provider 'openai)
+        (anak/gptel-set-provider 'openai))
 
 
 ;; (defun anak/gptel-patch-key! (&optional backend key-fn)
@@ -358,7 +356,7 @@ Each entry maps PROVIDER -> plist with :env and :backend.
   :bind (("C-c a" . aidermacs-transient-menu))
   :config
   ; defun my-get-openrouter-api-key yourself elsewhere for security reasons
-  (setenv "OPENAI_API_KEY" (anak/doppler-get-secret "OPENAI_API_KEY" "rag-chatbot-worktree" "dev_personal" t))
+  (setenv "OPENAI_API_KEY" (anak/doppler-get-secret "OPENAI_API_KEY" "rag-chatbot-worktree" "dev_personal"))
   :custom
   ; See the Configuration section below
   (aidermacs-default-chat-mode 'architect)
