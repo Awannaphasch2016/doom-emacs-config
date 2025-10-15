@@ -159,8 +159,6 @@ and remove the buffer to avoid leaving the secret visible."
           (let ((val (string-trim (with-current-buffer buf (buffer-string)))))
             (if copy
                 (progn
-                  ;; erase or kill buffer so secret isn't left on screen
-                  (when (buffer-live-p buf) (kill-buffer buf))
                   (message "✅ Secret %s copied to kill-ring (buffer removed)" name))
               (progn
                 (display-buffer buf)
