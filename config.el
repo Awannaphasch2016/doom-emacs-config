@@ -267,8 +267,7 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 (setq org-agenda-files
       '("~/org/todo/work.org"
-        "~/org/todo/personal.org"
-        "~/org/todo.org"))
+        "~/org/todo/personal.org"))
 
 (use-package! symbol-overlay
   :config
@@ -345,4 +344,14 @@ Each entry maps PROVIDER -> plist with :env and :backend.
                 (aw-switch-to-window (aw-select nil))
                 (call-interactively (symbol-function ',fn)))))))
 
-  (define-key embark-file-map (kbd "o") (my/embark-ace-action find-file)))
+(define-key embark-file-map (kbd "o") (my/embark-ace-action find-file)))
+
+(defun my/embark-vsplit-file (file)
+  "Split window horizontally, open FILE in new window, and move cursor there."
+  (interactive "fFile: ")
+  (split-window-horizontally)
+  (other-window 1)
+  (find-file file))
+
+(after! embark
+  (define-key embark-file-map (kbd "v") #'my/embark-vsplit-file))
