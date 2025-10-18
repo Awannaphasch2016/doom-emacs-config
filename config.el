@@ -345,12 +345,5 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 (after! embark
   (define-key embark-file-map (kbd "v") #'my/embark-vsplit-file))
 
-(use-package! aidermacs
-  :bind (("C-c a" . aidermacs-transient-menu))
-  :config
-  ; defun my-get-openrouter-api-key yourself elsewhere for security reasons
-  (setenv "OPENAI_API_KEY" (anak/doppler-get-secret "OPENAI_API_KEY" "rag-chatbot-worktree" "dev_personal"))
-  :custom
-  ; See the Configuration section below
-  (aidermacs-default-chat-mode 'architect)
-  (aidermacs-default-model "sonnet"))
+(after! aidermacs
+  (setq aidermacs-program "aider"))
