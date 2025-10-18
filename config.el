@@ -199,54 +199,53 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
 
 ;;; --- Provider registry: OpenAI + Anthropic ---------------------------------
 
-(after! gptel
-  (defvar anak/gptel-providers
-        `((openai
-        :env "OPENAI_API_KEY"
-        :backend (lambda ()
-                        (gptel-make-openai
-                        "openai"
-                        :protocol "https"
-                        :host "api.openai.com"
-                        :endpoint "/v1/chat/completions"
-                        :models '(gpt-4o gpt-4o-mini)
-                        :key #'anak/gptel-api-key
-                        :stream t
-                        :curl-args '("--retry" "2" "--max-time" "60")
-                        :request-params '(:temperature 0.7 :top_p 1.0))))
-        (anthropic
-        :env "ANTHROPIC_API_KEY"
-        :backend (lambda ()
-                        (gptel-make-anthropic
-                        "anthropic"
-                        :key #'anak/gptel-api-key
-                        :models '(claude-3-5-sonnet claude-3-5-haiku)
-                        :stream t
-                        :curl-args '("--retry" "2" "--max-time" "60")
-                        :request-params '(:temperature 0.7 :top_p 1.0)))))
-        "Registry of GPTel providers (OpenAI and Anthropic only).
-        Each entry maps PROVIDER -> plist with :env and :backend.
-        :backend must return a fully constructed `gptel-backend' struct.")
+(defvar anak/gptel-providers
+  `((openai
+     :env "OPENAI_API_KEY"
+     :backend (lambda ()
+                (gptel-make-openai
+                    "openai"
+                  :protocol "https"
+                  :host "api.openai.com"
+                  :endpoint "/v1/chat/completions"
+                  :models '(gpt-4o gpt-4o-mini)
+                  :key #'anak/gptel-api-key
+                  :stream t
+                  :curl-args '("--retry" "2" "--max-time" "60")
+                  :request-params '(:temperature 0.7 :top_p 1.0))))
+    (anthropic
+     :env "ANTHROPIC_API_KEY"
+     :backend (lambda ()
+                (gptel-make-anthropic
+                    "anthropic"
+                  :key #'anak/gptel-api-key
+                  :models '(claude-3-5-sonnet claude-3-5-haiku)
+                  :stream t
+                  :curl-args '("--retry" "2" "--max-time" "60")
+                  :request-params '(:temperature 0.7 :top_p 1.0)))))
+  "Registry of GPTel providers (OpenAI and Anthropic only).
+Each entry maps PROVIDER -> plist with :env and :backend.
+:backend must return a fully constructed `gptel-backend' struct.")
 
-        (defun anak/gptel--provider-names ()
-        (mapcar #'symbol-name (mapcar #'car anak/gptel-providers)))
+(defun anak/gptel--provider-names ()
+  (mapcar #'symbol-name (mapcar #'car anak/gptel-providers)))
 
-        ;;; --- Provider switcher ------------------------------------------------------
+;;; --- Provider switcher ------------------------------------------------------
 
-        (defun anak/gptel-set-provider (provider)
-        "Activate GPTel PROVIDER (symbol). Uses env var per `anak/gptel-providers'."
-        (interactive
-        (list (intern (completing-read "Provider: " (anak/gptel--provider-names) nil t))))
-        (let* ((spec (alist-get provider anak/gptel-providers)))
-        (unless spec (user-error "Unknown provider: %s" provider))
-        (setq anak/gptel-current-envvar (plist-get spec :env))
-        (setq gptel-backend (funcall (plist-get spec :backend)))
-        (setq gptel-api-key #'anak/gptel-api-key)
-        (message "gptel -> provider: %s (env: %s)"
-                provider (or anak/gptel-current-envvar "none")))
-        gptel-backend)
+(defun anak/gptel-set-provider (provider)
+  "Activate GPTel PROVIDER (symbol). Uses env var per `anak/gptel-providers'."
+  (interactive
+   (list (intern (completing-read "Provider: " (anak/gptel--provider-names) nil t))))
+  (let* ((spec (alist-get provider anak/gptel-providers)))
+    (unless spec (user-error "Unknown provider: %s" provider))
+    (setq anak/gptel-current-envvar (plist-get spec :env))
+    (setq gptel-backend (funcall (plist-get spec :backend)))
+    (setq gptel-api-key #'anak/gptel-api-key)
+    (message "gptel -> provider: %s (env: %s)"
+             provider (or anak/gptel-current-envvar "none")))
+  gptel-backend)
 
-        (anak/gptel-set-provider 'openai))
+(anak/gptel-set-provider 'openai)
 
 
 ;; (defun anak/gptel-patch-key! (&optional backend key-fn)
