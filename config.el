@@ -351,3 +351,31 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 ;; can't get it to work correctly
 ;; (setq! emacs-everywhere-app-info-function  #'emacs-everywhere--app-info-linux-x11)
 
+;; (use-package! moldable-emacs
+;;   :load-path "~/.config/emacs/.local/straight/build-30.2/moldable-emacs/"
+;;   :config
+;;   (require 'moldable-emacs)
+;;   (add-to-list 'me-files-with-molds (concat (file-name-directory (symbol-file 'me-mold)) "molds/experiments.el")) ;; TODO this is relevant only if you have private molds
+;;   (me-setup-molds))
+;; (add-load-path! "~/.config/emacs/.local/straight/build-30.2/moldable-emacs/molds")
+
+;; (use-package! moldable-emacs
+;;   :init (if (f-directory-p "~/.emacs.d/lisp/moldable-emacs")
+;;             (shell-command "cd ~/.emacs.d/lisp/moldable-emacs; git pull;")
+;;           (shell-command "cd ~/.emacs.d/lisp/; git clone git@github.com:ag91/moldable-emacs.git"))
+
+;;   :load-path "~/.emacs.d/lisp/moldable-emacs/"
+
+;;   :config
+;;   (require 'moldable-emacs)
+;;   (add-to-list 'me-files-with-molds (concat (file-name-directory (symbol-file 'me-mold)) "molds/experiments.el")) ;; TODO this is relevant only if you have private molds
+;;   (me-setup-molds))
+;; (add-load-path! "~/.emacs.d/lisp/moldable-emacs/molds")
+
+
+;; (add-to-list 'load-path "~/downloads/moldable-emacs/")
+(add-to-list 'load-path "~/.config/emacs/.local/straight/repos/moldable-emacs/")
+(require 'moldable-emacs)
+;; (add-to-list 'me-files-with-molds "~/downloads/moldable-emacs/molds/core.el")
+;; (add-to-list 'me-files-with-molds "~/downloads/moldable-emacs/molds/contrib.el")
+(me-setup-molds)

@@ -65,3 +65,8 @@
 (package! ekg)
 (package! ace-window)
 (package! aidermacs)
+(package! moldable-emacs
+  :recipe (:host github
+           :repo "ag91/moldable-emacs")
+  ;; :pin "c806cb8"
+  )

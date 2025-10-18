@@ -396,3 +396,13 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 ;; can't get it to work correctly
 ;; (setq! emacs-everywhere-app-info-function  #'emacs-everywhere--app-info-linux-x11)
 #+end_src
+* moldable emacs
+
+#+begin_src elisp :tangle ../config.el
+;; (add-to-list 'load-path "~/downloads/moldable-emacs/")
+(add-to-list 'load-path "~/.config/emacs/.local/straight/repos/moldable-emacs/")
+(require 'moldable-emacs)
+;; (add-to-list 'me-files-with-molds "~/downloads/moldable-emacs/molds/core.el")
+;; (add-to-list 'me-files-with-molds "~/downloads/moldable-emacs/molds/contrib.el")
+(me-setup-molds)
+#+end_src
