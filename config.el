@@ -79,12 +79,12 @@
 
 (defun anak/load-doppler-env (&optional project config)
   "Load Doppler environment variables for PROJECT and CONFIG into the current Emacs session.
-Defaults to project 'rag-chatbot-worktree' and config 'dev_personal'."
+Defaults to project 'anak' and config 'dev_personal'."
   (interactive
    (list
-    (read-string "Doppler project: " "rag-chatbot-worktree")
+    (read-string "Doppler project: " "anak")
     (read-string "Doppler config: " "dev_personal")))
-  (let* ((project (or project "rag-chatbot-worktree"))
+  (let* ((project (or project "anak"))
          (config  (or config "dev_personal"))
          (doppler-cmd (format "doppler run --project %s --config %s --command env"
                               project config)))
@@ -117,7 +117,7 @@ Sanitizes NAME to Doppler rules (only uppercase letters, digits and underscores)
   (interactive
    (let ((n (read-string "Secret name: "))
          (v (read-passwd "Secret value (hidden): "))
-         (p (read-string "Doppler project: " "rag-chatbot-worktree"))
+         (p (read-string "Doppler project: " "anak"))
          (c (read-string "Doppler config: " "dev_personal")))
      (list n v p c)))
   (let* ((safe-name (anak/doppler--sanitize-secret-name name)))
@@ -138,15 +138,11 @@ Sanitizes NAME to Doppler rules (only uppercase letters, digits and underscores)
           (display-buffer buffer))))))
 
 ;; Requires your existing anak/doppler--sanitize-secret-name
-
-
-(defun anak/doppler-get-secret (name project config &optional copy)
-  "Get a Doppler secret NAME for PROJECT/CONFIG.
-If COPY is non-nil (or user answers yes), copy the raw secret value to the kill-ring
-and remove the buffer to avoid leaving the secret visible."
+(defun anak/doppler-get-secret (name project config)
+  "Get a Doppler secret NAME for PROJECT/CONFIG."
   (interactive
    (let* ((n (read-string "Secret name: "))
-          (p (read-string "Doppler project: " "rag-chatbot-worktree"))
+          (p (read-string "Doppler project: " "anak"))
           (c (read-string "Doppler config: " "dev_personal"))
           (use-copy (y-or-n-p "Copy secret value to kill-ring (will remove buffer)? ")))
      (list n p c use-copy)))
@@ -158,9 +154,7 @@ and remove the buffer to avoid leaving the secret visible."
           (env (current-kill 0)))
       (if (= exit 0)
           (progn
-            (if copy
-                (message "✅ Secret %s copied to kill-ring (buffer removed)" name)
-              (message "✅ Secret %s retrieved (visible in %s)" name (buffer-name buf)))
+            (message "✅ Secret %s retrieved (visible in %s)" name (buffer-name buf))
             env)
         (message "❌ Doppler get failed (exit %d) — see buffer %s" exit (buffer-name buf))))))
 
@@ -171,7 +165,7 @@ By default prompts for confirmation. If ASSUME-YES is non-nil (or user answers y
 to the first prompt), the function will pass --yes to Doppler to proceed non-interactively."
   (interactive
    (let* ((n (read-string "Secret name to delete: "))
-          (p (read-string "Doppler project: " "rag-chatbot-worktree"))
+          (p (read-string "Doppler project: " "anak"))
           (c (read-string "Doppler config: " "dev_personal"))
           (y (y-or-n-p (format "Are you sure you want to delete %s from %s:%s? " n p c))))
      (list n p c y)))
