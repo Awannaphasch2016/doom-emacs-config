@@ -316,7 +316,7 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
   (map! :n "C-u" #'good-scroll-down-full-screen
         :n "C-d" #'good-scroll-up-full-screen))
 
-(use-package ekg
+(use-package! ekg
   :init
   (require 'ekg-embedding)
   (ekg-embedding-generate-on-save)
