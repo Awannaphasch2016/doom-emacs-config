@@ -324,16 +324,16 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 (after! embark
   (eval-when-compile
-        (defmacro my/embark-ace-action (fn)
-        `(defun ,(intern (concat "my/embark-ace-" (symbol-name fn))) ()
-        (interactive)
-        (with-demoted-errors "%s"
-        (require 'ace-window)
-        (let ((aw-dispatch-always t))
-                (aw-switch-to-window (aw-select nil))
-                (call-interactively (symbol-function ',fn)))))))
+    (defmacro my/embark-ace-action (fn)
+      `(defun ,(intern (concat "my/embark-ace-" (symbol-name fn))) ()
+         (interactive)
+         (with-demoted-errors "%s"
+           (require 'ace-window)
+           (let ((aw-dispatch-always t))
+             (aw-switch-to-window (aw-select nil))
+             (call-interactively (symbol-function ',fn)))))))
 
-(define-key embark-file-map (kbd "o") (my/embark-ace-action find-file)))
+  (define-key embark-file-map (kbd "o") (my/embark-ace-action find-file)))
 
 (defun my/embark-vsplit-file (file)
   "Split window horizontally, open FILE in new window, and move cursor there."
