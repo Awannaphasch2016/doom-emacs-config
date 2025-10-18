@@ -347,3 +347,7 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 (after! aidermacs
   (setq aidermacs-program "aider"))
+
+;; can't get it to work correctly
+;; (setq! emacs-everywhere-app-info-function  #'emacs-everywhere--app-info-linux-x11)
+

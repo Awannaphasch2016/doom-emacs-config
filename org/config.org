@@ -390,3 +390,9 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 (after! aidermacs
   (setq aidermacs-program "aider"))
 #+end_src
+* emacs-everywhere
+
+#+begin_src elisp :tangle ../config.el
+;; can't get it to work correctly
+;; (setq! emacs-everywhere-app-info-function  #'emacs-everywhere--app-info-linux-x11)
+#+end_src
