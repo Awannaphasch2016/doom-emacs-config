@@ -70,3 +70,5 @@
            :repo "ag91/moldable-emacs")
   ;; :pin "c806cb8"
   )
+;; (package! eaf
+;;   :recipe (:local-repo "~/downloads/emacs-application-framework"))
