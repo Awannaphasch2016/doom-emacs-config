@@ -342,7 +342,7 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 #+end_src
 * ekg
 #+begin_src elisp :tangle ../config.el
-(use-package ekg
+(use-package! ekg
   :init
   (require 'ekg-embedding)
   (ekg-embedding-generate-on-save)
