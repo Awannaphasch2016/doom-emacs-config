@@ -2,7 +2,7 @@
 
 * Doom Default
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 ;; -*- no-byte-compile: t; -*-
 ;;; $DOOMDIR/packages.el
 
@@ -59,7 +59,7 @@
 ;; (unpin! t)
 #+end_src
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
@@ -138,34 +138,34 @@
 ;; they are implemented.
 #+end_src
 * Keybinding
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 (map! :v "v" #'er/expand-region)
 #+end_src
 
 * symbol-overlay
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 (package! symbol-overlay)
 #+end_src
 
 * verb
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 ;; (package! verb)
 #+end_src
 * aws-mode
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 ;; (package! aws-mode
 ;;   :recipe (:host github
 ;;            :repo "snowiow/aws.el"
 ;;            :files ("*.el")))
 #+end_src
 * ssh-config-mode
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 ;; (package! ssh-config-mode)
 #+end_src
 
 * Doppler
 ** load environment
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 (defun anak/load-doppler-env (&optional project config)
   "Load Doppler environment variables for PROJECT and CONFIG into the current Emacs session.
 Defaults to project 'anak' and config 'dev_personal'."
@@ -194,7 +194,7 @@ Defaults to project 'anak' and config 'dev_personal'."
 (anak/load-doppler-env)
 #+end_src
 ** set/get/delete key
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 (defun anak/doppler--sanitize-secret-name (name)
   "Return NAME converted to Doppler-safe secret name (A-Z, 0-9 and underscore).
 Replaces any disallowed character with underscore and upcases the result."
@@ -278,92 +278,110 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
 
 
 * GPTel
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 
-(defvar anak/gptel-current-envvar nil
-  "Env var name holding the API key for the currently active provider.")
+;; (defvar anak/gptel-current-envvar nil
+;;   "Env var name holding the API key for the currently active provider.")
 
-(defun anak/gptel-api-key ()
-  "Return the API key string for the active provider, or nil."
-  (when anak/gptel-current-envvar
-    (getenv anak/gptel-current-envvar)))
+;; (defun anak/gptel-api-key ()
+;;   "Return the API key string for the active provider, or nil."
+;;   (when anak/gptel-current-envvar
+;;     (getenv anak/gptel-current-envvar)))
 
-;;; --- Provider registry: OpenAI + Anthropic ---------------------------------
+;; ;;; --- Provider registry: OpenAI + Anthropic ---------------------------------
 
-(defvar anak/gptel-providers
-  `((openai
-     :env "OPENAI_API_KEY"
-     :backend (lambda ()
-                (gptel-make-openai
-                 "openai"
-                 :protocol "https"
-                 :host "api.openai.com"
-                 :endpoint "/v1/chat/completions"
-                 :models '(gpt-4o gpt-4o-mini)
-                 :key #'anak/gptel-api-key
-                 :stream t
-                 :curl-args '("--retry" "2" "--max-time" "60")
-                 :request-params '(:temperature 0.7 :top_p 1.0))))
-    (anthropic
-     :env "ANTHROPIC_API_KEY"
-     :backend (lambda ()
-                (gptel-make-anthropic
-                 "anthropic"
-                 :key #'anak/gptel-api-key
-                 :models '(claude-3-5-sonnet claude-3-5-haiku)
-                 :stream t
-                 :curl-args '("--retry" "2" "--max-time" "60")
-                 :request-params '(:temperature 0.7 :top_p 1.0)))))
-  "Registry of GPTel providers (OpenAI and Anthropic only).
-Each entry maps PROVIDER -> plist with :env and :backend.
-:backend must return a fully constructed `gptel-backend' struct.")
+;; (defvar anak/gptel-providers
+;;   `((openai
+;;      :env "OPENAI_API_KEY"
+;;      :backend (lambda ()
+;;                 (gptel-make-openai
+;;                  "openai"
+;;                  :protocol "https"
+;;                  :host "api.openai.com"
+;;                  :endpoint "/v1/chat/completions"
+;;                  :models '(gpt-4o gpt-4o-mini)
+;;                  :key #'anak/gptel-api-key
+;;                  :stream t
+;;                  :curl-args '("--retry" "2" "--max-time" "60")
+;;                  :request-params '(:temperature 0.7 :top_p 1.0))))
+;;     (anthropic
+;;      :env "ANTHROPIC_API_KEY"
+;;      :backend (lambda ()
+;;                 (gptel-make-anthropic
+;;                  "anthropic"
+;;                  :key #'anak/gptel-api-key
+;;                  :models '(claude-3-5-sonnet claude-3-5-haiku)
+;;                  :stream t
+;;                  :curl-args '("--retry" "2" "--max-time" "60")
+;;                  :request-params '(:temperature 0.7 :top_p 1.0)))))
+;;   "Registry of GPTel providers (OpenAI and Anthropic only).
+;; Each entry maps PROVIDER -> plist with :env and :backend.
+;; :backend must return a fully constructed `gptel-backend' struct.")
 
-(defun anak/gptel--provider-names ()
-  (mapcar #'symbol-name (mapcar #'car anak/gptel-providers)))
+;; (defun anak/gptel--provider-names ()
+;;   (mapcar #'symbol-name (mapcar #'car anak/gptel-providers)))
 
-;;; --- Provider switcher ------------------------------------------------------
+;; ;;; --- Provider switcher ------------------------------------------------------
 
-(defun anak/gptel-set-provider (provider)
-  "Activate GPTel PROVIDER (symbol). Uses env var per `anak/gptel-providers'."
-  (interactive
-   (list (intern (completing-read "Provider: " (anak/gptel--provider-names) nil t))))
-  (let* ((spec (alist-get provider anak/gptel-providers)))
-    (unless spec (user-error "Unknown provider: %s" provider))
-    (setq anak/gptel-current-envvar (plist-get spec :env))
-    (setq gptel-backend (funcall (plist-get spec :backend)))
-    (setq gptel-api-key #'anak/gptel-api-key)
-    (message "gptel -> provider: %s (env: %s)"
-             provider (or anak/gptel-current-envvar "none")))
-  gptel-backend)
+;; (defun anak/gptel-set-provider (provider)
+;;   "Activate GPTel PROVIDER (symbol). Uses env var per `anak/gptel-providers'."
+;;   (interactive
+;;    (list (intern (completing-read "Provider: " (anak/gptel--provider-names) nil t))))
+;;   (let* ((spec (alist-get provider anak/gptel-providers)))
+;;     (unless spec (user-error "Unknown provider: %s" provider))
+;;     (setq anak/gptel-current-envvar (plist-get spec :env))
+;;     (setq gptel-backend (funcall (plist-get spec :backend)))
+;;     (setq gptel-api-key #'anak/gptel-api-key)
+;;     (message "gptel -> provider: %s (env: %s)"
+;;              provider (or anak/gptel-current-envvar "none")))
+;;   gptel-backend)
 
-(anak/gptel-set-provider 'openai)
-;; (anak/gptel-set-provider 'open-router)
-;; (anak/gptel-set-provider 'anthropic)
-(setq gptel-log-level 'debug)
-(setq gptel-default-mode 'org-mode)
+;; (anak/gptel-set-provider 'openai)
+;; ;; (anak/gptel-set-provider 'open-router)
+;; ;; (anak/gptel-set-provider 'anthropic)
+;; (setq gptel-log-level 'debug)
+;; (setq gptel-default-mode 'org-mode)
 
 
-;; (defun anak/gptel-patch-key! (&optional backend key-fn)
-;;   "Destructively set :key slot on BACKEND (default `gptel-backend').
-;; Returns the new key function."
-;;   (let* ((be (or backend gptel-backend)))
-;;     (unless (and be (gptel-backend-p be))
-;;       (user-error "Not a gptel-backend: %S" be))
-;;     (setf (gptel-backend-key be) (or key-fn #'anak/gptel-api-key))
-;;     (message "gptel: patched key slot -> %S" (gptel-backend-key be))
-;;     (gptel-backend-key be)))
+;; ;; (defun anak/gptel-patch-key! (&optional backend key-fn)
+;; ;;   "Destructively set :key slot on BACKEND (default `gptel-backend').
+;; ;; Returns the new key function."
+;; ;;   (let* ((be (or backend gptel-backend)))
+;; ;;     (unless (and be (gptel-backend-p be))
+;; ;;       (user-error "Not a gptel-backend: %S" be))
+;; ;;     (setf (gptel-backend-key be) (or key-fn #'anak/gptel-api-key))
+;; ;;     (message "gptel: patched key slot -> %S" (gptel-backend-key be))
+;; ;;     (gptel-backend-key be)))
 
-;; (anak/gptel-patch-key!)
+;; ;; (anak/gptel-patch-key!)
+
+
+(after! gptel
+  (setq gptel-log-level 'debug)
+  (setq gptel-default-mode 'org-mode)
+  (setq gptel-backend
+        (gptel-make-openai "OpenRouter"               ;Any name you want
+          :host "openrouter.ai"
+          :endpoint "/api/v1/chat/completions"
+          :stream t
+          :key (auth-source-pick-first-password :host "openrouter.ai")
+          :models '(mistralai/mixtral-8x7b-instruct
+                    openai/gpt-3.5-turbo
+                    meta-llama/codellama-34b-instruct
+                    codellama/codellama-70b-instruct
+                    google/palm-2-codechat-bison-32k
+                    google/gemini-pro))
+        gptel-model   'openai/gpt-3.5-turbo))
 #+end_src
 
 * org agenda
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 (setq org-agenda-files
       '("~/org/todo/work.org"
         "~/org/todo/personal.org"))
 #+end_src
 * symbol-overlay
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 (use-package! symbol-overlay
   :config
   (setq symbol-overlay-idle-time 0.2)
@@ -371,7 +389,7 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 #+end_src
 
 * lsp
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 (defun anak/set-project-root-as-default-directory ()
   "Ensure current buffer's default-directory is the project root for Python tools."
   (when (and (derived-mode-p 'python-mode)
@@ -384,7 +402,7 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 #+end_src
 
 * neotree
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;; (defun anak/neotree-toggle-and-find ()
 ;;   "Toggle NeoTree and reveal the current file."
 ;;   (interactive)
@@ -414,11 +432,11 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 * good scroll
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 (package! good-scroll)
 #+end_src
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 (use-package! good-scroll
   :hook (doom-first-input . good-scroll-mode)
   :config
@@ -433,12 +451,12 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 * ekg
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 ;; (package! ekg)
 #+end_src
 
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;; (use-package! ekg
 ;;   :init
 ;;   (require 'ekg-embedding)
@@ -453,16 +471,16 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 * ace-window
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 (package! ace-window)
 #+end_src
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;; (use-package! ace-window)
 #+end_src
 
 * embark
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 (after! embark
   (eval-when-compile
         (defmacro my/embark-ace-action (fn)
@@ -489,25 +507,25 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 * aider
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 (package! aidermacs)
 #+end_src
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 (after! aidermacs
   (setq aidermacs-program "aider"))
 #+end_src
 
 * emacs-everywhere
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;; can't get it to work correctly
 ;; (setq! emacs-everywhere-app-info-function  #'emacs-everywhere--app-info-linux-x11)
 #+end_src
 
 * moldable emacs
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 (package! moldable-emacs
   :recipe (:host github
            :repo "ag91/moldable-emacs")
@@ -515,7 +533,7 @@ Each entry maps PROVIDER -> plist with :env and :backend.
   )
 #+end_src
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 (use-package! moldable-emacs
   :load-path  "~/.config/emacs/.local/straight/repos/moldable-emacs/"
   ;; (add-to-list 'load-path "~/downloads/moldable-emacs/")
@@ -528,13 +546,13 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 #+end_src
 * eaf
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 ;; (package! eaf
 ;;   :recipe (:local-repo "~/downloads/emacs-application-framework"))
 #+end_src
 
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;; (use-package! eaf
 ;;   :load-path "~/downloads/emacs-application-framework"
 ;;   :init
@@ -565,11 +583,11 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 * justl
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 ;; (package! justl :recipe (:host github :repo "psibi/justl.el"))
 #+end_src
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;; (use-package! justl
 ;;   :config
 ;;   (map! :n "c j" 'justl-exec-recipe))
@@ -577,11 +595,11 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 * detached
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 ;; (package! detached)
 #+end_src
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;; (use-package! detached
 ;;   :init
 ;;   (detached-init)
@@ -654,11 +672,11 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 * org download
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 ;; (package! org-download)
 #+end_src
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;; (use-package! org-download
 ;;   :after org
 ;;   :config
@@ -707,7 +725,7 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 * system package
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 (defun my-list-apt-installed-packages ()
   "Open a buffer listing all apt-installed packages."
   (interactive)
@@ -723,7 +741,7 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 * consult-gh
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 ;; (package! consult-gh
 ;;   :recipe (:host github :repo "armindarvish/consult-gh" :branch "main"))
 ;; (package! consult-gh-embark
@@ -732,7 +750,7 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 ;;   :recipe (:host github :repo "armindarvish/consult-gh" :branch "main"))
 #+end_src
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;; (use-package! consult-gh
 ;;   :after consult
 ;;   :custom
@@ -790,18 +808,18 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 * consult-omni
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;; (use-package! consult-omni
 ;;   :after consult)
 #+end_src
 
 * code-compass
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 ;; (package! code-compass)
 #+end_src
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;; (use-package! code-compass
 ;;   :config
 ;;   (code-compass-install))
@@ -809,12 +827,12 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 * grid-table
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 ;; (package! grid-table
 ;;   :recipe (:host github :repo "yibie/grid-table" :branch "main"))
 #+end_src
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;; (use-package! grid-table
 ;;   :config
 ;;   (require 'grid-table)
@@ -825,11 +843,11 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 #+end_src
 * popper
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 (package! popper)
 #+end_src
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 (use-package! popper
   :bind (("C-`"   . popper-toggle)
          ("M-`"   . popper-cycle)
@@ -848,13 +866,13 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 * superchat
 
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 (package! superchat
   :recipe (:host github :repo "yibie/superchat" :branch "main"))
 #+end_src
 
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;; (use-package! superchat
 ;;   :after gptel
 ;;   :config
@@ -864,13 +882,13 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 * context-navigator
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 ;; (package! context-navigator
 ;;   :recipe (:host github :repo "11111000000/context-navigator"))
 #+end_src
 
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;; (use-package! context-navigator
 ;;   :custom
 ;;   (context-navigator-global-key "C-c n")
@@ -882,7 +900,7 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 * avy
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 (use-package! avy
   :config
     (defun avy-action-kill-whole-line (pt)
@@ -953,12 +971,12 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 
 * atlas
 
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 ;; (package! atlas
 ;;   :recipe (:host github :repo "11111000000/atlas"))
 #+end_src
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;; (use-package atlas
 ;;   :commands (atlas-index atlas-entity-tree atlas-progress-mode)
 ;;   :init
@@ -966,13 +984,46 @@ Each entry maps PROVIDER -> plist with :env and :backend.
 #+end_src
 
 * efrit
-#+begin_src elisp :tangle ../packages.el
+#+begin_src elisp :tangle packages.el
 ;; (package! efrit
 ;;   :recipe (:host github :repo "steveyegge/efrit"))
 #+end_src
 
-#+begin_src elisp :tangle ../config.el
+#+begin_src elisp :tangle config.el
 ;; (use-package! efrit
 ;;   :config
 ;;   (setq efrit-data-directory "~/elfrit-data"))
+#+end_src
+
+* shell-maker
+
+#+begin_src elisp :tangle packages.el
+(package! shell-maker)
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! shell-maker
+  :config
+  (require 'shell-maker))
+#+end_src
+* acp
+
+#+begin_src elisp :tangle packages.el
+(package! acp :recipe (:host github :repo "xenodium/acp.el"))
+#+end_src
+* agent-shell
+
+#+begin_src elisp :tangle packages.el
+(package! agent-shell :recipe (:host github :repo "xenodium/agent-shell"))
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! agent-shell
+  :after auth-source
+  :config
+  (require 'agent-shell)
+  (setq agent-shell-anthropic-claude-environment
+        (agent-shell-make-environment-variables :inherit-env t))
+  (setq agent-shell-openai-authentication
+        (agent-shell-openai-make-authentication :api-key (auth-source-pick-first-password :host "api.anthropic.com"))))
 #+end_src
