@@ -1,65 +1,3 @@
-#+title: Config
-
-* Doom Default
-
-#+begin_src elisp :tangle packages.el
-;; -*- no-byte-compile: t; -*-
-;;; $DOOMDIR/packages.el
-
-;; To install a package:
-;;
-;;   1. Declare them here in a `package!' statement,
-;;   2. Run 'doom sync' in the shell,
-;;   3. Restart Emacs.
-;
-;; Use 'C-h f package\!' to look up documentation for the `package!' macro.
-
-
-;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
-;; (package! some-package)
-
-;; To install a package directly from a remote git repo, you must specify a
-;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
-;; https://github.com/radian-software/straight.el#the-recipe-format
-;; (package! another-package
-;;   :recipe (:host github :repo "username/repo"))
-
-;; If the package you are trying to install does not contain a PACKAGENAME.el
-;; file, or is located in a subdirectory of the repo, you'll need to specify
-;; `:files' in the `:recipe':
-;; (package! this-package
-;;   :recipe (:host github :repo "username/repo"
-;;            :files ("some-file.el" "src/lisp/*.el")))
-
-;; If you'd like to disable a package included with Doom, you can do so here
-;; with the `:disable' property:
-;; (package! builtin-package :disable t)
-
-;; You can override the recipe of a built in package without having to specify
-;; all the properties for `:recipe'. These will inherit the rest of its recipe
-;; from Doom or MELPA/ELPA/Emacsmirror:
-;; (package! builtin-package :recipe (:nonrecursive t))
-;; (package! builtin-package-2 :recipe (:repo "myfork/package"))
-
-;; Specify a `:branch' to install a package from a particular branch or tag.
-;; This is required for some packages whose default branch isn't 'master' (which
-;; our package manager can't deal with; see radian-software/straight.el#279)
-;; (package! builtin-package :recipe (:branch "develop"))
-
-;; Use `:pin' to specify a particular commit to install.
-;; (package! builtin-package :pin "1a2b3c4d5e")
-
-
-;; Doom's packages are pinned to a specific commit and updated from release to
-;; release. The `unpin!' macro allows you to unpin single packages...
-;; (unpin! pinned-package)
-;; ...or multiple packages
-;; (unpin! pinned-package another-pinned-package)
-;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
-;; (unpin! t)
-#+end_src
-
-#+begin_src elisp :tangle config.el
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
@@ -136,36 +74,9 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
-#+end_src
-* Keybinding
-#+begin_src elisp :tangle config.el
+
 (map! :v "v" #'er/expand-region)
-#+end_src
 
-* symbol-overlay
-#+begin_src elisp :tangle packages.el
-(package! symbol-overlay)
-#+end_src
-
-* verb
-#+begin_src elisp :tangle packages.el
-;; (package! verb)
-#+end_src
-* aws-mode
-#+begin_src elisp :tangle packages.el
-;; (package! aws-mode
-;;   :recipe (:host github
-;;            :repo "snowiow/aws.el"
-;;            :files ("*.el")))
-#+end_src
-* ssh-config-mode
-#+begin_src elisp :tangle packages.el
-;; (package! ssh-config-mode)
-#+end_src
-
-* Doppler
-** load environment
-#+begin_src elisp :tangle config.el
 (defun anak/load-doppler-env (&optional project config)
   "Load Doppler environment variables for PROJECT and CONFIG into the current Emacs session.
 Defaults to project 'anak' and config 'dev_personal'."
@@ -192,9 +103,7 @@ Defaults to project 'anak' and config 'dev_personal'."
 
 (anak/load-doppler-env "rag-chatbot-worktree" "dev_personal")
 (anak/load-doppler-env)
-#+end_src
-** set/get/delete key
-#+begin_src elisp :tangle config.el
+
 (defun anak/doppler--sanitize-secret-name (name)
   "Return NAME converted to Doppler-safe secret name (A-Z, 0-9 and underscore).
 Replaces any disallowed character with underscore and upcases the result."
@@ -274,11 +183,6 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
         (progn
           (display-buffer buf)
           (message "❌ Doppler delete failed (exit %d) — see buffer %s" exit (buffer-name buf)))))))
-#+end_src
-
-
-* GPTel
-#+begin_src elisp :tangle config.el
 
 ;; (defvar anak/gptel-current-envvar nil
 ;;   "Env var name holding the API key for the currently active provider.")
@@ -370,39 +274,44 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
                     meta-llama/codellama-34b-instruct
                     codellama/codellama-70b-instruct
                     google/palm-2-codechat-bison-32k
-                    google/gemini-pro))
+                    google/gemini-pro
+                    qwen/qwen3-30b-a3b))
         gptel-model   'openai/gpt-3.5-turbo))
-#+end_src
 
-* org agenda
-#+begin_src elisp :tangle config.el
 (setq org-agenda-files
       '("~/org/todo/work.org"
         "~/org/todo/personal.org"))
-#+end_src
-* symbol-overlay
-#+begin_src elisp :tangle config.el
+
 (use-package! symbol-overlay
   :config
   (setq symbol-overlay-idle-time 0.2)
   (add-hook 'prog-mode-hook #'symbol-overlay-mode))
-#+end_src
 
-* lsp
-#+begin_src elisp :tangle config.el
-(defun anak/set-project-root-as-default-directory ()
-  "Ensure current buffer's default-directory is the project root for Python tools."
-  (when (and (derived-mode-p 'python-mode)
-             (fboundp 'projectile-project-root))
-    (setq default-directory (projectile-project-root))))
+;; (defun anak/set-project-root-as-default-directory ()
+;;   "Ensure current buffer's default-directory is the project root for Python tools."
+;;   (when (and (derived-mode-p 'python-mode)
+;;              (fboundp 'projectile-project-root))
+;;     (setq default-directory (projectile-project-root))))
 
-(add-hook 'python-mode-hook #'anak/set-project-root-as-default-directory)
-(add-hook 'python-mode-hook #'lsp-deferred)  ;; or #'lsp-deferred
+;; (add-hook 'python-mode-hook #'anak/set-project-root-as-default-directory)
 
-#+end_src
+;; (use-package tree-sitter
+;;   :config
+;;   ;; Python configuration
+;;   (setq treesit-language-source-alist
+;;         '((python "https://github.com/tree-sitter/tree-sitter-python" "v0.20.4"))))
+;; (after! tree-sitter
+;;   (unless (treesit-ready-p 'python)
+;;     (treesit-install-language-grammar 'python)))
 
-* neotree
-#+begin_src elisp :tangle config.el
+;; (use-package! python
+;;   :config
+;;   (setq python-indent-guess-indent-offset-verbose nil)
+
+;;   ;; Use tree-sitter mode if available
+;;   (when (treesit-ready-p 'python)
+;;     (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))))
+
 ;; (defun anak/neotree-toggle-and-find ()
 ;;   "Toggle NeoTree and reveal the current file."
 ;;   (interactive)
@@ -428,15 +337,7 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
 ;;   (map! :leader
 ;;         :desc "NeoTree open" "o n" #'anak/neotree-toggle-and-find
 ;;         :desc "NeoTree find this file" "o N" nil))
-#+end_src
 
-* good scroll
-
-#+begin_src elisp :tangle packages.el
-(package! good-scroll)
-#+end_src
-
-#+begin_src elisp :tangle config.el
 (use-package! good-scroll
   :hook (doom-first-input . good-scroll-mode)
   :config
@@ -447,16 +348,7 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
   ;; Optional: make PageUp/PageDown smooth
   (map! :n "C-u" #'good-scroll-down-full-screen
         :n "C-d" #'good-scroll-up-full-screen))
-#+end_src
 
-* ekg
-
-#+begin_src elisp :tangle packages.el
-;; (package! ekg)
-#+end_src
-
-
-#+begin_src elisp :tangle config.el
 ;; (use-package! ekg
 ;;   :init
 ;;   (require 'ekg-embedding)
@@ -467,16 +359,7 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
 ;;     (setq ekg-llm-provider my-provider
 ;;           ekg-embedding-provider my-provider
 ;;           ekg-db-file "~/database/ekg.sqlite")))
-#+end_src
 
-* ace-window
-
-#+begin_src elisp :tangle packages.el
-(package! ace-window)
-#+end_src
-
-#+begin_src elisp :tangle config.el
-;; (use-package! ace-window)
 
 (defun anak/store-last-window (&rest _args)
   "Store current window before ace-window switch."
@@ -495,22 +378,19 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
 (map! :leader
       :desc "Jump to last window"
       "w r" #'anak/jump-to-last-window)
-#+end_src
 
-* embark
-#+begin_src elisp :tangle config.el
 (after! embark
   (eval-when-compile
-        (defmacro my/embark-ace-action (fn)
-        `(defun ,(intern (concat "my/embark-ace-" (symbol-name fn))) ()
-        (interactive)
-        (with-demoted-errors "%s"
-        (require 'ace-window)
-        (let ((aw-dispatch-always t))
-                (aw-switch-to-window (aw-select nil))
-                (call-interactively (symbol-function ',fn)))))))
+    (defmacro my/embark-ace-action (fn)
+      `(defun ,(intern (concat "my/embark-ace-" (symbol-name fn))) ()
+         (interactive)
+         (with-demoted-errors "%s"
+           (require 'ace-window)
+           (let ((aw-dispatch-always t))
+             (aw-switch-to-window (aw-select nil))
+             (call-interactively (symbol-function ',fn)))))))
 
-(define-key embark-file-map (kbd "o") (my/embark-ace-action find-file)))
+  (define-key embark-file-map (kbd "o") (my/embark-ace-action find-file)))
 
 (defun my/embark-vsplit-file (file)
   "Split window horizontally, open FILE in new window, and move cursor there."
@@ -521,37 +401,18 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
 
 (after! embark
   (define-key embark-file-map (kbd "v") #'my/embark-vsplit-file))
-#+end_src
 
-* aider
-
-#+begin_src elisp :tangle packages.el
-(package! aidermacs)
-#+end_src
-
-#+begin_src elisp :tangle config.el
-(after! aidermacs
+(use-package! aidermacs
+  :config
+  (map! :n "C-c a" #'aidermacs-transient-menu)
   (setq aidermacs-program "aider"))
-#+end_src
 
-* emacs-everywhere
+;; (after! aidermacs
+;;   (setq aidermacs-program "aider"))
 
-#+begin_src elisp :tangle config.el
 ;; can't get it to work correctly
 ;; (setq! emacs-everywhere-app-info-function  #'emacs-everywhere--app-info-linux-x11)
-#+end_src
 
-* moldable emacs
-
-#+begin_src elisp :tangle packages.el
-(package! moldable-emacs
-  :recipe (:host github
-           :repo "ag91/moldable-emacs")
-  ;; :pin "c806cb8"
-  )
-#+end_src
-
-#+begin_src elisp :tangle config.el
 (use-package! moldable-emacs
   :load-path  "~/.config/emacs/.local/straight/repos/moldable-emacs/"
   ;; (add-to-list 'load-path "~/downloads/moldable-emacs/")
@@ -561,63 +422,63 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
   :config
   (require 'moldable-emacs)
   (me-setup-molds))
-#+end_src
-* eaf
 
-#+begin_src elisp :tangle packages.el
-;; (package! eaf
-;;   :recipe (:local-repo "~/downloads/emacs-application-framework"))
-#+end_src
+(use-package! eaf
+  :load-path "~/downloads/emacs-application-framework"
+  :init
+  (require 'eaf)
+  (require 'eaf-browser)
+  (require 'eaf-pdf-viewer)
+  (require 'eaf-evil)
+  :custom
+  (eaf-browser-continue-where-left-off t)
+  (eaf-browser-enable-adblocker t)
+  (browse-url-browser-function 'eaf-open-browser)
+  :config
+  ;; (setq! eaf-dired-advisor-enable nil)
+  ;; (setq! eaf-find-file-advisor-enable nil)
+  (defalias 'browse-web #'eaf-open-browser)
+  (define-key key-translation-map (kbd "SPC")
+              (lambda (prompt)
+                (if (derived-mode-p 'eaf-mode)
+                    (pcase eaf--buffer-app-name
+                      ("browser" (if  eaf-buffer-input-focus
+                                     (kbd "SPC")
+                                   (kbd eaf-evil-leader-key)))
+                      ("pdf-viewer" (kbd eaf-evil-leader-key))
+
+                      ("image-viewer" (kbd eaf-evil-leader-key))
+                      (_  (kbd "SPC")))
+                  (kbd "SPC"))))
+  )
+
+(use-package! justl
+  :config
+  ;; Normal buffer (recipes)
+  (evil-define-key 'normal justl-mode-map
+    (kbd "g r") #'justl--refresh-buffer
+    (kbd "e")   #'justl-exec-recipe
+    (kbd "E")   #'justl-exec-shell
+    (kbd "?")   #'justl-help-popup
+    (kbd "h")   #'justl-help-popup
+    (kbd "w")   #'justl--exec-recipe-with-args
+    (kbd "W")   #'justl-no-exec-shell
+    (kbd "m")   #'justl--show-modules
+    (kbd "RET") #'justl-go-to-recipe)
+
+  ;; Module buffer
+  (evil-define-key 'normal justl-module-mode-map
+    (kbd "g r") #'justl--module-refresh-buffer
+    (kbd "e")   #'justl-exec-module
+    (kbd "?")   #'justl-module-help-popup
+    (kbd "h")   #'justl-module-help-popup
+    (kbd "o")   #'justl--module-open-justl
+    (kbd "RET") #'justl--go-to-module)
+
+  (map! :map justl-mode
+        :leader "p j" #'justl))
 
 
-#+begin_src elisp :tangle config.el
-;; (use-package! eaf
-;;   :load-path "~/downloads/emacs-application-framework"
-;;   :init
-;;   (require 'eaf)
-;; (require 'eaf-browser)
-;; (require 'eaf-pdf-viewer)
-;; (require 'eaf-evil)
-;; :custom
-;; (eaf-browser-continue-where-left-off t)
-;; (eaf-browser-enable-adblocker t)
-;; (browse-url-browser-function 'eaf-open-browser)
-;; :config
-;; (defalias 'browse-web #'eaf-open-browser)
-;; (define-key key-translation-map (kbd "SPC")
-;;             (lambda (prompt)
-;;               (if (derived-mode-p 'eaf-mode)
-;;                   (pcase eaf--buffer-app-name
-;;                     ("browser" (if  eaf-buffer-input-focus
-;;                                    (kbd "SPC")
-;;                                  (kbd eaf-evil-leader-key)))
-;;                     ("pdf-viewer" (kbd eaf-evil-leader-key))
-
-;;                     ("image-viewer" (kbd eaf-evil-leader-key))
-;;                     (_  (kbd "SPC")))
-;;                 (kbd "SPC"))))
-;; )
-#+end_src
-
-* justl
-
-#+begin_src elisp :tangle packages.el
-;; (package! justl :recipe (:host github :repo "psibi/justl.el"))
-#+end_src
-
-#+begin_src elisp :tangle config.el
-;; (use-package! justl
-;;   :config
-;;   (map! :n "c j" 'justl-exec-recipe))
-#+end_src
-
-* detached
-
-#+begin_src elisp :tangle packages.el
-;; (package! detached)
-#+end_src
-
-#+begin_src elisp :tangle config.el
 ;; (use-package! detached
 ;;   :init
 ;;   (detached-init)
@@ -686,15 +547,7 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
 ;;     (kbd "<return>") #'detached-list-open-session)
 
 ;;   (evil-define-key 'normal vterm-mode-map  (kbd "C-<return>") #'detached-vterm-attach))
-#+end_src
 
-* org download
-
-#+begin_src elisp :tangle packages.el
-;; (package! org-download)
-#+end_src
-
-#+begin_src elisp :tangle config.el
 ;; (use-package! org-download
 ;;   :after org
 ;;   :config
@@ -739,11 +592,7 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
 ;;       (message "No image data found in clipboard!"))))
 
 ;; (global-set-key (kbd "C-S-v") #'anak/paste-image-anywhere)
-#+end_src
 
-* system package
-
-#+begin_src elisp :tangle config.el
 (defun my-list-apt-installed-packages ()
   "Open a buffer listing all apt-installed packages."
   (interactive)
@@ -755,20 +604,7 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
       (goto-char (point-min))
       (read-only-mode 1))
     (pop-to-buffer buf)))
-#+end_src
 
-* consult-gh
-
-#+begin_src elisp :tangle packages.el
-;; (package! consult-gh
-;;   :recipe (:host github :repo "armindarvish/consult-gh" :branch "main"))
-;; (package! consult-gh-embark
-;;   :recipe (:host github :repo "armindarvish/consult-gh" :branch "main"))
-;; (package! consult-gh-forge
-;;   :recipe (:host github :repo "armindarvish/consult-gh" :branch "main"))
-#+end_src
-
-#+begin_src elisp :tangle config.el
 ;; (use-package! consult-gh
 ;;   :after consult
 ;;   :custom
@@ -821,36 +657,14 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
 ;;   :config
 ;;   (consult-gh-forge-mode +1)
 ;;   (setq consult-gh-forge-timeout-seconds 20))
-#+end_src
 
-
-* consult-omni
-
-#+begin_src elisp :tangle config.el
 ;; (use-package! consult-omni
 ;;   :after consult)
-#+end_src
 
-* code-compass
-
-#+begin_src elisp :tangle packages.el
-;; (package! code-compass)
-#+end_src
-
-#+begin_src elisp :tangle config.el
 ;; (use-package! code-compass
 ;;   :config
 ;;   (code-compass-install))
-#+end_src
 
-* grid-table
-
-#+begin_src elisp :tangle packages.el
-;; (package! grid-table
-;;   :recipe (:host github :repo "yibie/grid-table" :branch "main"))
-#+end_src
-
-#+begin_src elisp :tangle config.el
 ;; (use-package! grid-table
 ;;   :config
 ;;   (require 'grid-table)
@@ -858,14 +672,7 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
 ;;   (setq grid-table-default-save-directory "~/Documents/grid-table/")
 ;;   (setq grid-table-image-target-char-height 8)
 ;;   (setq grid-table-image-max-width-ratio 0.9))
-#+end_src
-* popper
 
-#+begin_src elisp :tangle packages.el
-(package! popper)
-#+end_src
-
-#+begin_src elisp :tangle config.el
 (use-package! popper
   :bind (("C-`"   . popper-toggle)
          ("M-`"   . popper-cycle)
@@ -880,173 +687,192 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
   (popper-mode +1)
   (popper-echo-mode +1)
   (setq! popper-group-function #'popper-group-by-projectile))
-#+end_src
-* superchat
 
+(use-package! superchat
+  :after gptel mcp
+  :config
+  (setq superchat-response-timeout 10))
 
-#+begin_src elisp :tangle packages.el
-(package! superchat
-  :recipe (:host github :repo "yibie/superchat" :branch "main"))
-#+end_src
+(use-package! context-navigator
+  :custom
+  (context-navigator-autoload t)
+  (context-navigator-autosave t)
+  :config
+  (context-navigator-mode 1)
+  (map! :leader
+        :desc "context-navigator menu"
+        "o l n" #'context-navigator-view-open-menu))
 
-
-#+begin_src elisp :tangle config.el
-;; (use-package! superchat
-;;   :after gptel
-;;   :config
-;;   (setq gptel-use-tools nil)
-;;   (setq superchat-response-timeout 10))
-#+end_src
-
-* context-navigator
-
-#+begin_src elisp :tangle packages.el
-;; (package! context-navigator
-;;   :recipe (:host github :repo "11111000000/context-navigator"))
-#+end_src
-
-
-#+begin_src elisp :tangle config.el
-;; (use-package! context-navigator
-;;   :custom
-;;   (context-navigator-global-key "C-c n")
-;;   (context-navigator-autoload t)
-;;   (context-navigator-autosave t)
-;;   :config
-;;   (context-navigator-mode 1))
-#+end_src
-
-* avy
-
-#+begin_src elisp :tangle config.el
 (use-package! avy
   :config
-    (defun avy-action-kill-whole-line (pt)
+  (defun avy-action-kill-whole-line (pt)
     (save-excursion
-        (goto-char pt)
-        (kill-whole-line))
+      (goto-char pt)
+      (kill-whole-line))
     (select-window
-    (cdr
-        (ring-ref avy-ring 0)))
+     (cdr
+      (ring-ref avy-ring 0)))
     t)
 
-    (defun avy-action-teleport-whole-line (pt)
+  (defun avy-action-teleport-whole-line (pt)
     (avy-action-kill-whole-line pt)
     (save-excursion (yank)) t)
-    (defun avy-action-mark-to-char (pt)
+  (defun avy-action-mark-to-char (pt)
     (activate-mark)
     (goto-char pt))
 
-                                            ;Replace your package manager or preferred dict package
-    (defun dictionary-search-dwim (&optional arg)
+                                        ;Replace your package manager or preferred dict package
+  (defun dictionary-search-dwim (&optional arg)
     "Search for definition of word at point. If region is active,
     search for contents of region instead. If called with a prefix
     argument, query for word to search."
     (interactive "P")
     (if arg
         (dictionary-search nil)
-        (if (use-region-p)
-            (dictionary-search (buffer-substring-no-properties
-                                (region-beginning)
-                                (region-end)))
+      (if (use-region-p)
+          (dictionary-search (buffer-substring-no-properties
+                              (region-beginning)
+                              (region-end)))
         (if (thing-at-point 'word)
             (dictionary-lookup-definition)
-            (dictionary-search-dwim '(4))))))
+          (dictionary-search-dwim '(4))))))
 
-    (defun avy-action-define (pt)
+  (defun avy-action-define (pt)
     (save-excursion
-        (goto-char pt)
-        (dictionary-search-dwim))
+      (goto-char pt)
+      (dictionary-search-dwim))
     (select-window
-    (cdr (ring-ref avy-ring 0)))
+     (cdr (ring-ref avy-ring 0)))
     t)
 
-    (defun avy-action-helpful (pt)
+  (defun avy-action-helpful (pt)
     (save-excursion
-        (goto-char pt)
-        (helpful-at-point))
+      (goto-char pt)
+      (helpful-at-point))
     (select-window
-    (cdr (ring-ref avy-ring 0)))
+     (cdr (ring-ref avy-ring 0)))
     t)
 
-    (defun avy-action-flyspell (pt)
+  (defun avy-action-flyspell (pt)
     (save-excursion
-        (goto-char pt)
-        (when (require 'flyspell nil t)
+      (goto-char pt)
+      (when (require 'flyspell nil t)
         (flyspell-auto-correct-word)))
     (select-window
-    (cdr (ring-ref avy-ring 0)))
+     (cdr (ring-ref avy-ring 0)))
     t)
 
-    (setf (alist-get ?k avy-dispatch-alist) 'avy-action-kill-whole-line
+  (setf (alist-get ?k avy-dispatch-alist) 'avy-action-kill-whole-line
         (alist-get ?T avy-dispatch-alist) 'avy-action-teleport-whole-line
         (alist-get ?Z  avy-dispatch-alist) 'avy-action-mark-to-char
         (alist-get ?= avy-dispatch-alist) 'dictionary-search-dwim
         (alist-get ?H avy-dispatch-alist) 'avy-action-helpful
         (alist-get ?\; avy-dispatch-alist) 'avy-action-flyspell)
-)
-#+end_src
+  )
 
-* atlas
-
-#+begin_src elisp :tangle packages.el
-;; (package! atlas
-;;   :recipe (:host github :repo "11111000000/atlas"))
-#+end_src
-
-#+begin_src elisp :tangle config.el
 ;; (use-package atlas
 ;;   :commands (atlas-index atlas-entity-tree atlas-progress-mode)
 ;;   :init
 ;;   (require 'atlas-autoloads))
-#+end_src
 
-* efrit
-#+begin_src elisp :tangle packages.el
-;; (package! efrit
-;;   :recipe (:host github :repo "steveyegge/efrit"))
-#+end_src
+(use-package! efrit
+  :config
+  (setq efrit-data-directory "~/elfrit-data")
+  (setq! efrit-model "claude-sonnet-4-5-20250929"))
 
-#+begin_src elisp :tangle config.el
-;; (use-package! efrit
-;;   :config
-;;   (setq efrit-data-directory "~/elfrit-data"))
-#+end_src
-
-* shell-maker
-
-#+begin_src elisp :tangle packages.el
-(package! shell-maker)
-#+end_src
-
-#+begin_src elisp :tangle config.el
 (use-package! shell-maker
   :config
   (require 'shell-maker))
-#+end_src
-* acp
 
-#+begin_src elisp :tangle packages.el
-(package! acp :recipe (:host github :repo "xenodium/acp.el"))
-#+end_src
-* agent-shell
-
-#+begin_src elisp :tangle packages.el
-(package! agent-shell :recipe (:host github :repo "xenodium/agent-shell"))
-#+end_src
-
-#+begin_src elisp :tangle config.el
 (use-package! agent-shell
   :after auth-source
   :config
   (require 'agent-shell)
   (setq agent-shell-anthropic-claude-environment
         (agent-shell-make-environment-variables :inherit-env t))
-  (setq agent-shell-openai-authentication
-        (agent-shell-openai-make-authentication :api-key (auth-source-pick-first-password :host "api.anthropic.com"))))
-#+end_src
-* magit-ediff
-#+begin_src elisp :tangle config.el
+  ;; (setq agent-shell-openai-authentication
+  ;;       (agent-shell-openai-make-authentication :api-key (auth-source-pick-first-password :host "openai.com")))
+  )
+
+
+(defun anak/duplicate-workspace ()
+  "Duplicate current Doom workspace (tab) layout and buffers, prompting for name."
+  (interactive)
+  (require 'persp-mode)
+  (require 'subr-x) ;; for string-empty-p, string-trim
+  (let* ((current (persp-name (get-current-persp)))
+         (entered (string-trim
+                   (read-string (format "Name for duplicate of \"%s\": " current))))
+         ;; If user leaves it blank or chooses an existing name, auto-unique it.
+         (final-name (let ((n (if (string-empty-p entered) nil entered)))
+                       (if (member n (persp-names))
+                           (generate-new-buffer-name n)
+                         n))))
+    (persp-add-new final-name)
+    (persp-copy current final-name)
+    (persp-switch final-name)
+    (message "Duplicated workspace: %s -> %s" current final-name)))
+(map! :leader
+      :desc "Duplicate current workspace"
+      "TAB R" #'anak/duplicate-workspace)
+
+
+(defcustom context-navigator-global-key "C-c n"
+  "Global key sequence for opening the Context Navigator transient.
+Default is \"C-c n\"."
+  :type '(choice (const :tag "None" nil) (string :tag "Key sequence"))
+  :group 'context-navigator
+  :set (lambda (sym val)
+         (set-default sym val)
+         (when (fboundp 'context-navigator--update-global-keybinding)
+           (ignore-errors (context-navigator--update-global-keybinding)))))
+
+(map! :leader
+      "o l n" #'context-navigator-view-open-menu)
+
+;; (map! :mode context-navigator-view-mode
+;;       :n
+;;       "H"  #'context-navigator-groups-split-toggle
+;;       "q" #'context-navigator-view-quit
+;;       "D" #'context-navigator-view-delete-dispatch
+;;       "M" #'context-navigator-view-toggle-dispatch
+;;       "L" #'context-navigator-view-activate)
+
+;; (map! :mode context-navigator-groups-split-mode
+;;       :n
+;;       "l" #'context-navigator-groups-split-select
+;;       "SPC" #'nil)
+
+(add-hook 'context-navigator-view-mode-hook
+          (lambda ()
+
+            (evil-local-set-key 'normal (kbd "n") #'context-navigator-toggle)
+            (evil-local-set-key 'normal (kbd "m") #'context-navigator-view-toggle-dispatch)
+            (evil-local-set-key 'normal (kbd "h") #'context-navigator-groups-split-toggle)
+            (evil-local-set-key 'normal (kbd "q") #'context-navigator-view-quit)
+            (evil-local-set-key 'normal (kbd "d") #'context-navigator-view-delete-dispatch)
+            (evil-local-set-key 'normal (kbd "?") #'context-navigator-view-open-menu)
+            (evil-local-set-key 'normal (kbd "p") #'context-navigator-view-push-now)
+            (evil-local-set-key 'normal (kbd "u") #'context-navigator-undo)
+            (evil-local-set-key 'normal (kbd "C-r") #'context-navigator-redo)
+            (evil-local-set-key 'normal (kbd "s") #'context-navigator-view-filter-by-names)
+            (evil-local-set-key 'normal (kbd "f") #'context-navigator-view-filter-by-content )
+            (evil-local-set-key 'normal (kbd "F") #'context-navigator-view-filter-clear)
+
+            (evil-local-set-key 'normal (kbd "l") #'context-navigator-groups-split-select )
+            (evil-local-set-key 'normal (kbd "m") #'context-navigator-view-group-toggle-select )
+            (evil-local-set-key 'normal (kbd "a") #'context-navigator-view-group-create )
+            (evil-local-set-key 'normal (kbd "R") #'context-navigator-view-group-rename )
+            (evil-local-set-key 'normal (kbd "E") #'context-navigator-view-group-edit-description )
+            (evil-local-set-key 'normal (kbd "C") #'context-navigator-view-group-duplicate )
+            (evil-local-set-key 'normal (kbd "D") #'context-navigator-view-delete-dispatch )
+            ))
+
+
+(add-hook 'context-navigator-groups-split-mode-hook
+          (lambda ()
+            (define-key context-navigator-groups-split-mode-map (kbd "SPC") nil)))
+
 ;; Magit Ediff keybindings under SPC g >
 (map! :leader
       (:prefix ("g" . "git")
@@ -1061,5 +887,61 @@ to the first prompt), the function will pass --yes to Doppler to proceed non-int
                 :desc "Ediff stash"          "h"  #'magit-ediff-show-stash
                 :desc "Ediff resolve all"    "r"  #'magit-ediff-resolve-all
                 :desc "Ediff resolve rest"   "R"  #'magit-ediff-resolve-rest)))
-#+end_src
-* gptel-mcp
+
+;; (use-package! gptel-mcp
+;;   :config (require 'gptel-mcp))
+
+(use-package mcp
+  :ensure t
+  :after gptel
+  :custom (mcp-hub-servers
+           `(("filesystem" . (:command "npx"
+                              :args ("-y" "@modelcontextprotocol/server-filesystem")
+                              :roots ("/home/anak/tmp/")))
+             ("fetch" . (:command "uvx" :args ("mcp-server-fetch")))
+             ;; ("qdrant" . (:url "http://localhost:8000/sse"))
+             ("graphlit" . (
+                            :command "npx"
+                            :args ("-y" "graphlit-mcp-server")
+                            :env (
+                                  :GRAPHLIT_ORGANIZATION_ID "your-organization-id"
+                                  :GRAPHLIT_ENVIRONMENT_ID "your-environment-id"
+                                  :GRAPHLIT_JWT_SECRET "your-jwt-secret")))
+             ))
+  :config
+  (require 'mcp-hub)
+
+  (push (gptel-make-tool
+         :name "get_weather"
+         :description "Get current weather for a city"
+         :args '((:name "city"
+                  :type string
+                  :description "City name"
+                  :required t))
+         :function (lambda (city)
+                     (format "The weather in %s is sunny, 72°F" city)))
+        gptel-tools)
+  :hook (after-init . mcp-hub-start-all-server))
+
+
+;; (set-fontset-font t 'thai (font-spec :family "Noto Sans Thai") nil 'prepend)
+;; (set-fontset-font t 'thai (font-spec :family "TlwgTypist") nil 'prepend)
+(set-fontset-font t 'thai (font-spec :family "Loma") nil 'prepend)
+;; (setq use-default-font-for-symbols t)
+
+;; (after! eglot
+;;   ;; (add-to-list 'eglot-server-programs
+;;   ;;              '(python-ts-mode . ("basedpyright-langserver" "--stdio")))
+;;   (setq-default eglot-workspace-configuration
+;;                 '(:basedpyright (:venvPath "."
+;;                                  ;; :venv ".venv"
+;;                                  :analysis (:typeCheckingMode "strict"
+;;                                             :diagnosticMode "workspace"
+;;                                             :autoImportCompletions t
+;;                                             :useLibraryCodeForTypes t))))
+;;   )
+
+(use-package! piper
+  :load-path "/home/anak/.config/emacs/.local/straight/repos/emacs-piper/"
+  :config
+  (map! :n "C-c C-|" #'piper))

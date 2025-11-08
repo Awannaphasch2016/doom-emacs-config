@@ -3,3 +3,5 @@
 *.log
 tmp/
 flycheck_config.el
+.context/*
+node_modules/*
