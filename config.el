@@ -945,3 +945,7 @@ Default is \"C-c n\"."
   :load-path "/home/anak/.config/emacs/.local/straight/repos/emacs-piper/"
   :config
   (map! :n "C-c C-|" #'piper))
+
+(use-package! emacs-with-nyxt
+  :config
+  (setq browse-url-browser-function #'browse-url-nyxt))

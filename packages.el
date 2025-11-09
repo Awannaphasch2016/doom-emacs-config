@@ -74,7 +74,10 @@
 
 (package! moldable-emacs
   :recipe (:host github
-           :repo "ag91/moldable-emacs")
+           ;; :repo "ag91/moldable-emacs"
+           :repo "Awannaphasch2016/moldable-emacs"
+           :branch "pipe"
+           )
   ;; :pin "c806cb8"
   )
 
@@ -134,3 +137,8 @@
 
 (package! emacs-piper
   :recipe (:host gitlab :repo "howardabrams/emacs-piper"))
+
+
+
+(package! emacs-with-nyxt
+  :recipe (:host github :repo "ag91/emacs-with-nyxt"))
