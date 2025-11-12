@@ -873,20 +873,40 @@ Default is \"C-c n\"."
           (lambda ()
             (define-key context-navigator-groups-split-mode-map (kbd "SPC") nil)))
 
+(defun anak/gh-create-repo-and-push ()
+  "Create a private GitHub repo using the current directory name and push code.
+Uses: gh repo create {dir-name} --private --source=. --remote=origin --push"
+  (interactive)
+  (let* ((default-directory (if (magit-toplevel)
+                                (magit-toplevel)
+                              default-directory))
+         (dir-name (file-name-nondirectory (directory-file-name default-directory)))
+         (cmd (format "gh repo create %s --private --source=. --remote=origin --push"
+                      (shell-quote-argument dir-name))))
+    (message "Creating GitHub repo: %s" dir-name)
+    (let ((output (shell-command-to-string cmd)))
+      (if (string-match-p "error\\|failed\\|not a git repository." output)
+          (message "❌ Failed to create repo: %s" output)
+        (progn
+          (message "✅ Successfully created and pushed to: %s" dir-name)
+          (when (fboundp 'magit-refresh)
+            (magit-refresh)))))))
+
 ;; Magit Ediff keybindings under SPC g >
 (map! :leader
       (:prefix ("g" . "git")
-               (:prefix (">" . "ediff")
-                :desc "Ediff dwim"           ">"  #'magit-ediff-dwim
-                :desc "Ediff compare"        "c"  #'magit-ediff-compare
-                :desc "Ediff commit"         "m"  #'magit-ediff-show-commit
-                :desc "Ediff staged"         "s"  #'magit-ediff-show-staged
-                :desc "Ediff unstaged"       "u"  #'magit-ediff-show-unstaged
-                :desc "Ediff working tree"   "w"  #'magit-ediff-show-working-tree
-                :desc "Ediff stage file"     "S"  #'magit-ediff-stage
-                :desc "Ediff stash"          "h"  #'magit-ediff-show-stash
-                :desc "Ediff resolve all"    "r"  #'magit-ediff-resolve-all
-                :desc "Ediff resolve rest"   "R"  #'magit-ediff-resolve-rest)))
+       :desc "Create GitHub repo & push" "^" #'anak/gh-create-repo-and-push
+       (:prefix (">" . "ediff")
+        :desc "Ediff dwim"           ">"  #'magit-ediff-dwim
+        :desc "Ediff compare"        "c"  #'magit-ediff-compare
+        :desc "Ediff commit"         "m"  #'magit-ediff-show-commit
+        :desc "Ediff staged"         "s"  #'magit-ediff-show-staged
+        :desc "Ediff unstaged"       "u"  #'magit-ediff-show-unstaged
+        :desc "Ediff working tree"   "w"  #'magit-ediff-show-working-tree
+        :desc "Ediff stage file"     "S"  #'magit-ediff-stage
+        :desc "Ediff stash"          "h"  #'magit-ediff-show-stash
+        :desc "Ediff resolve all"    "r"  #'magit-ediff-resolve-all
+        :desc "Ediff resolve rest"   "R"  #'magit-ediff-resolve-rest)))
 
 ;; (use-package! gptel-mcp
 ;;   :config (require 'gptel-mcp))
@@ -949,3 +969,13 @@ Default is \"C-c n\"."
 (use-package! emacs-with-nyxt
   :config
   (setq browse-url-browser-function #'browse-url-nyxt))
+
+;; (use-package! agent-menu
+;;   :load-path "/home/anak/dev/my-packages/claude-transcient"
+;;   :config
+;;   (map! :desc "AI Agents" :n "C-c a" #'agent-menu-smart-launch))
+
+(load! "agent-menu.el" "/home/anak/dev/claude-transcient")
+(load! "cursor-transient.el" "/home/anak/dev/claude-transcient")
+(load! "claude-transient.el" "/home/anak/dev/claude-transcient")
+(map! :desc "AI Agents" :n "C-c a" #'agent-menu-smart-launch)

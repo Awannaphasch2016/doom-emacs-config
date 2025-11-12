@@ -142,3 +142,8 @@
 
 (package! emacs-with-nyxt
   :recipe (:host github :repo "ag91/emacs-with-nyxt"))
+
+(package! agent-menu
+  :recipe (:local-repo "/home/anak/dev/my-packages/claude-transcient"
+           :files ("*.el")
+           :type built-in))
