@@ -874,21 +874,48 @@ Default is \"C-c n\"."
             (define-key context-navigator-groups-split-mode-map (kbd "SPC") nil)))
 
 (defun anak/gh-create-repo-and-push ()
-  "Create a private GitHub repo using the current directory name and push code.
-Uses: gh repo create {dir-name} --private --source=. --remote=origin --push"
+  "Create a private GitHub repo using the current directory name.
+Automatically detects if commits exist and conditionally adds --push flag.
+If not a git repo, initializes one first."
   (interactive)
   (let* ((default-directory (if (magit-toplevel)
                                 (magit-toplevel)
                               default-directory))
          (dir-name (file-name-nondirectory (directory-file-name default-directory)))
-         (cmd (format "gh repo create %s --private --source=. --remote=origin --push"
-                      (shell-quote-argument dir-name))))
-    (message "Creating GitHub repo: %s" dir-name)
-    (let ((output (shell-command-to-string cmd)))
-      (if (string-match-p "error\\|failed\\|not a git repository." output)
+         (is-git-repo (file-exists-p (expand-file-name ".git" default-directory)))
+         (has-commits nil)
+         (push-flag ""))
+
+    ;; Initialize git repo if needed
+    (unless is-git-repo
+      (message "Not a git repository. Running git init...")
+      (shell-command-to-string "git init"))
+
+    ;; Check if commits exist
+    (let ((commit-count-output (shell-command-to-string "git rev-list --count HEAD 2>/dev/null")))
+      (setq has-commits (and (string-match "^[0-9]+$" (string-trim commit-count-output))
+                             (> (string-to-number (string-trim commit-count-output)) 0))))
+
+    ;; Set push flag if commits exist
+    (setq push-flag (if has-commits "--push" ""))
+
+    ;; Build and run gh command
+    (let* ((cmd (format "gh repo create %s --private --source=. --remote=origin %s"
+                        (shell-quote-argument dir-name)
+                        push-flag))
+           (output (progn
+                     (message "Creating GitHub repo: %s%s"
+                              dir-name
+                              (if has-commits " (with push)" ""))
+                     (shell-command-to-string cmd))))
+
+      ;; Check result
+      (if (string-match-p "error\\|failed" output)
           (message "❌ Failed to create repo: %s" output)
         (progn
-          (message "✅ Successfully created and pushed to: %s" dir-name)
+          (message "✅ Successfully created repo: %s%s"
+                   dir-name
+                   (if has-commits " and pushed commits" ""))
           (when (fboundp 'magit-refresh)
             (magit-refresh)))))))
 
