@@ -1006,3 +1006,9 @@ If not a git repo, initializes one first."
 (load! "cursor-transient.el" "/home/anak/dev/claude-transcient")
 (load! "claude-transient.el" "/home/anak/dev/claude-transcient")
 (map! :desc "AI Agents" :n "C-c a" #'agent-menu-smart-launch)
+
+(add-hook 'find-file-hook
+          (lambda ()
+            (when (and buffer-file-name
+                       (string-match "\\.jsonl\\'" buffer-file-name))
+              (json-mode))))
