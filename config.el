@@ -1002,11 +1002,15 @@ If not a git repo, initializes one first."
 ;;   :config
 ;;   (map! :desc "AI Agents" :n "C-c a" #'agent-menu-smart-launch))
 
-(load! "agent-menu.el" "/home/anak/dev/claude-transcient")
 (load! "cursor-transient.el" "/home/anak/dev/claude-transcient")
 (load! "claude-transient.el" "/home/anak/dev/claude-transcient")
-(map! :desc "AI Agents" :n "C-c a" #'agent-menu-smart-launch)
+(load! "mcp-tools-transient.el" "/home/anak/dev/claude-transcient")
+(load! "mcp-tools-list.el" "/home/anak/dev/claude-transcient")
+(load! "mcp-keybindings.el" "/home/anak/dev/claude-transcient")
+(load! "mcp-hub-integration.el" "/home/anak/dev/claude-transcient")
+(load! "agent-menu.el" "/home/anak/dev/claude-transcient")
 
+(map! :desc "AI Agents" :n "C-c a" #'agent-menu-smart-launch)
 (add-hook 'find-file-hook
           (lambda ()
             (when (and buffer-file-name
