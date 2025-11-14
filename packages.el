@@ -147,3 +147,12 @@
   :recipe (:local-repo "/home/anak/dev/my-packages/claude-transcient"
            :files ("*.el")
            :type built-in))
+
+(package! aws
+  :recipe (:local-repo  "/home/anak/downloads/aws.el"
+           :files ("*.el")
+           :type local))
+
+(package! tramps3
+  :recipe (:local-repo  "/home/anak/downloads/tramps3"
+           :files ("*.el")))

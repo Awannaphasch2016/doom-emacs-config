@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: claude-config
+# uuid:
+# key: claude-config
+# condition: t
+# --
+
+{
+  "permissions": {
+    "allow": [
+      "Edit(*)",
+      "Write(*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

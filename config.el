@@ -1003,10 +1003,12 @@ If not a git repo, initializes one first."
 ;;   (map! :desc "AI Agents" :n "C-c a" #'agent-menu-smart-launch))
 
 (load! "cursor-transient.el" "/home/anak/dev/claude-transcient")
+(load! "claude-mcp-integration.el" "/home/anak/dev/claude-transcient")
+(load! "claude-mcp-tools-menu.el" "/home/anak/dev/claude-transcient")
 (load! "claude-transient.el" "/home/anak/dev/claude-transcient")
 (load! "mcp-tools-transient.el" "/home/anak/dev/claude-transcient")
 (load! "mcp-tools-list.el" "/home/anak/dev/claude-transcient")
-(load! "mcp-keybindings.el" "/home/anak/dev/claude-transcient")
+;; (load! "mcp-keybindings.el" "/home/anak/dev/claude-transcient")
 (load! "mcp-hub-integration.el" "/home/anak/dev/claude-transcient")
 (load! "agent-menu.el" "/home/anak/dev/claude-transcient")
 
@@ -1016,3 +1018,37 @@ If not a git repo, initializes one first."
             (when (and buffer-file-name
                        (string-match "\\.jsonl\\'" buffer-file-name))
               (json-mode))))
+
+
+(load! "aws-lambda-event-source-mapping.el" "/home/anak/downloads/aws.el")
+
+(use-package! aws
+  ;; :custom
+  ;; (aws-login-method 'sso) ;; options: 'profile, 'vault, 'sso (default: 'profile)
+  ;; (aws-output "json") ;; optional: yaml, json, text (default: yaml)
+  ;; (aws-bedrock-model "eu.anthropic.claude-sonnet-4-0-v1:0") ;; bedrock model for chat
+  ;; (aws-organizations-account "root")
+  :config
+  (map! :n "C-c A a" #'aws)
+  (map! :n "C-c A l" #'aws-login)
+  (map! :n "C-c A n" #'aws-organizations-get-account-name)
+  (map! :n "C-c A i" #'aws-organizations-get-account-id)
+
+  ) ;; profile of organizations account. organizations commands are automatically executed against this account, when specified
+
+(use-package! aws-evil
+  :after (aws-mode evil))
+
+(use-package! aws-s3
+  :config
+  (map! :map aws-s3-mode-map
+        :n "?" #'aws-s3-help-popup
+        :n "RET" #'aws-s3-open-bucket
+        :n "d" #'aws-s3-rb-under-cursor
+        :n "g" #'aws-s3-lb-refresh
+        :n "m" #'aws-s3-mb
+        :n "P" #'aws-set-profile
+        :n "q" #'aws
+        :n "r" #'aws-s3-lb-refresh))
+
+(use-package! tramps3)
